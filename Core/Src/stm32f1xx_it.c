@@ -37,6 +37,8 @@
 
 /* USER CODE BEGIN 0 */
 
+#include "logger.h"
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -54,6 +56,7 @@ void NMI_Handler(void)
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
+  HAL_RCC_NMI_IRQHandler();
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
 
   /* USER CODE END NonMaskableInt_IRQn 1 */
@@ -65,6 +68,8 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
+
+  LOG("HardFault occured");
 
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
@@ -84,6 +89,8 @@ void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
+  LOG("Memory management fauilt occured");
+
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -102,6 +109,8 @@ void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
 
+  LOG("Prefetch failure");
+
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -119,6 +128,8 @@ void BusFault_Handler(void)
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
+
+  LOG("Undefined instruction");
 
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
@@ -193,6 +204,19 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+* @brief This function handles RCC global interrupt.
+*/
+void RCC_IRQHandler(void)
+{
+  /* USER CODE BEGIN RCC_IRQn 0 */
+
+  /* USER CODE END RCC_IRQn 0 */
+  /* USER CODE BEGIN RCC_IRQn 1 */
+
+  /* USER CODE END RCC_IRQn 1 */
+}
+
+/**
 * @brief This function handles CAN RX1 interrupt.
 */
 void CAN1_RX1_IRQHandler(void)
@@ -207,6 +231,26 @@ void CAN1_RX1_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+  LOG("Received CAN message");
+}
+
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
+{
+  LOG("CAN error");
+}
+
+void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+  LOG("CAN transmisison complete");
+}
+
+void HAL_RCC_CSSCallback(void)
+{
+  LOG("Ceramic resonator has failed");
+}
 
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

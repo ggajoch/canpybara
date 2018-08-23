@@ -56,7 +56,8 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c \
 Core/Src/system_stm32f1xx.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Core/Src/logger.c \
-Core/Src/test.c 
+Core/Src/test.c \
+Core/Src/can.c 
 
 # ASM sources
 ASM_SOURCES =  \
