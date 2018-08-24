@@ -89,7 +89,7 @@ void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
-  LOG("Memory management fauilt occured");
+  LOG("Memory management fault occured");
 
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
@@ -217,11 +217,45 @@ void RCC_IRQHandler(void)
 }
 
 /**
+* @brief This function handles USB high priority or CAN TX interrupts.
+*/
+void USB_HP_CAN1_TX_IRQHandler(void)
+{
+  /* USER CODE BEGIN USB_HP_CAN1_TX_IRQn 0 */
+
+  LOG("CAN1 TX IRQ");
+
+  /* USER CODE END USB_HP_CAN1_TX_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN USB_HP_CAN1_TX_IRQn 1 */
+
+  /* USER CODE END USB_HP_CAN1_TX_IRQn 1 */
+}
+
+/**
+* @brief This function handles USB low priority or CAN RX0 interrupts.
+*/
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+  /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
+
+  LOG("CAN1 RX0 IRQ");
+
+  /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
+
+  /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
+}
+
+/**
 * @brief This function handles CAN RX1 interrupt.
 */
 void CAN1_RX1_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN1_RX1_IRQn 0 */
+
+  LOG("CAN1 RX1 IRQ");
 
   /* USER CODE END CAN1_RX1_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
@@ -230,21 +264,39 @@ void CAN1_RX1_IRQHandler(void)
   /* USER CODE END CAN1_RX1_IRQn 1 */
 }
 
+/**
+* @brief This function handles CAN SCE interrupt.
+*/
+void CAN1_SCE_IRQHandler(void)
+{
+  /* USER CODE BEGIN CAN1_SCE_IRQn 0 */
+
+  LOG("CAN1 SCE IRQ");
+
+  /* USER CODE END CAN1_SCE_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN CAN1_SCE_IRQn 1 */
+
+  /* USER CODE END CAN1_SCE_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
+
+void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+  LOG("CAN transmisison complete");
+}
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
   LOG("Received CAN message");
+
+  canpybara_can_rx(hcan);
 }
 
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
   LOG("CAN error");
-}
-
-void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-  LOG("CAN transmisison complete");
 }
 
 void HAL_RCC_CSSCallback(void)

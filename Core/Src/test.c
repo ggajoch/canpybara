@@ -111,13 +111,18 @@ void canpybara_test_sequence(void)
 
 	for(;;)
 	{
-		HAL_StatusTypeDef result = HAL_CAN_Transmit(&hcan, 500);
-		LOG("Transmitting CAN: %s, status: %d", result == HAL_OK ? "OK" : "FAILED", result);
+		HAL_StatusTypeDef result = HAL_CAN_Transmit(&hcan, 50);
+		// if(result != HAL_OK)
+		// {
+			LOG("Transmitting CAN: %s, status: %d", result == HAL_OK ? "OK" : "FAILED", result);
+			LOG(" ESR register: %"PRIu32, hcan.Instance->ESR);
+			
+		// }
 
 		// for (i = 0; i < 10; ++i)
 		// {
 			HAL_IWDG_Refresh(&hiwdg);
-			HAL_Delay(300);
+			HAL_Delay(1000);
 		// }
 	}
 

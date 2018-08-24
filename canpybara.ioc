@@ -1,8 +1,9 @@
 #MicroXplorer Configuration settings - do not modify
+CAN.ABOM=ENABLE
 CAN.BS1=CAN_BS1_6TQ
 CAN.CalculateTimeBit=2000
 CAN.CalculateTimeQuantum=250.0
-CAN.IPParameters=CalculateTimeQuantum,CalculateTimeBit,BS1,Prescaler
+CAN.IPParameters=CalculateTimeQuantum,CalculateTimeBit,BS1,Prescaler,ABOM
 CAN.Prescaler=2
 File.Version=6
 IWDG.IPParameters=Prescaler
@@ -57,6 +58,7 @@ MxCube.Version=4.26.1
 MxDb.Version=DB.4.0.261
 NVIC.BusFault_IRQn=true\:0\:0\:false\:false\:true\:false
 NVIC.CAN1_RX1_IRQn=true\:0\:0\:false\:false\:true\:true
+NVIC.CAN1_SCE_IRQn=true\:0\:0\:false\:false\:true\:true
 NVIC.DebugMonitor_IRQn=true\:0\:0\:false\:false\:true\:false
 NVIC.HardFault_IRQn=true\:0\:0\:false\:false\:true\:false
 NVIC.MemoryManagement_IRQn=true\:0\:0\:false\:false\:true\:false
@@ -66,6 +68,8 @@ NVIC.PriorityGroup=NVIC_PRIORITYGROUP_4
 NVIC.RCC_IRQn=true\:0\:0\:false\:false\:true\:true
 NVIC.SVCall_IRQn=true\:0\:0\:false\:false\:true\:false
 NVIC.SysTick_IRQn=true\:0\:0\:false\:false\:true\:false
+NVIC.USB_HP_CAN1_TX_IRQn=true\:0\:0\:false\:false\:true\:true
+NVIC.USB_LP_CAN1_RX0_IRQn=true\:0\:0\:false\:false\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:false
 PA0-WKUP.GPIOParameters=GPIO_PuPd,GPIO_Label
 PA0-WKUP.GPIO_Label=ADDR0
