@@ -1,10 +1,11 @@
 #include "stm32f1xx_hal.h"
 
 #include "can.h"
+#include "logger.h"
 
 extern CAN_HandleTypeDef hcan;
 
-void canpybara_gpio_report_input(void)
+void canpybara_gpio_report(void)
 {
 
 	uint8_t port_status = 0;
@@ -22,7 +23,7 @@ void canpybara_gpio_report_input(void)
 		}
 	}
 
-	CanTxMsgTypeDef CanTx;
+	static CanTxMsgTypeDef CanTx;
 	CanTx.StdId = CANPYBARA_REPORT_INRD;
 	CanTx.ExtId = 0;
 	CanTx.IDE = CAN_ID_STD;
@@ -32,6 +33,8 @@ void canpybara_gpio_report_input(void)
 
 	hcan.pTxMsg = &CanTx;
 	HAL_CAN_Transmit(&hcan, 50);
+
+	// canpybara_gpio_handle_outrdreq();
 }
 
 static uint16_t OUTPUTS[] = { OUT0_Pin, OUT1_Pin, OUT2_Pin, OUT3_Pin, OUT4_Pin, OUT5_Pin, RELAY0_Pin, RELAY1_Pin };
@@ -53,13 +56,13 @@ void canpybara_gpio_handle_outrdreq(void)
 	int i;
 	for (i = 0; i < OUTPUTS_LEN; ++i)
 	{
-		if(HAL_GPIO_ReadPin(OUTPUTS_PORT[i], OUTPUTS[i]) == GPIO_PIN_SET)
+		if(OUTPUTS_PORT[i]->ODR & OUTPUTS[i])
 		{
 			port_status |= 1 << i;
 		}
 	}
 
-	CanTxMsgTypeDef CanTx;
+	static CanTxMsgTypeDef CanTx;
 	CanTx.StdId = CANPYBARA_REPORT_OUTRD;
 	CanTx.ExtId = 0;
 	CanTx.IDE = CAN_ID_STD;

@@ -118,7 +118,7 @@ void canpybara_configure_filters(CAN_HandleTypeDef* hcan)
 
 	// Filter 1 : My addr
 	filter_config.FilterIdHigh = my_address << 5;
-	filter_config.FilterMaskIdHigh = 0x7F << 5;
+	filter_config.FilterMaskIdHigh = 0x8FE0;
 
 	// Filter 2 : Addr 0
 	filter_config.FilterIdLow = 0x000 << 5;
@@ -191,7 +191,7 @@ void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 
 	int request_id = CANPYBARA_CONTROLLER_REQUESTID(hcan->pRxMsg->StdId);
 
-	// LOG("Request id: %d", request_id);
+	// LOG("Request id: %d for %"PRIu32, request_id, hcan->pRxMsg->StdId);
 
 	switch(request_id)
 	{

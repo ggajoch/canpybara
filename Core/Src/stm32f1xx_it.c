@@ -323,7 +323,7 @@ void HAL_RCC_CSSCallback(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   // LOG("Timer");
-  canpybara_gpio_report_input();
+  canpybara_gpio_report();
 }
 
 
