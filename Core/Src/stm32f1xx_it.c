@@ -43,6 +43,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern CAN_HandleTypeDef hcan;
+extern TIM_HandleTypeDef htim1;
 
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
@@ -280,11 +281,26 @@ void CAN1_SCE_IRQHandler(void)
   /* USER CODE END CAN1_SCE_IRQn 1 */
 }
 
+/**
+* @brief This function handles TIM1 update interrupt.
+*/
+void TIM1_UP_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM1_UP_IRQn 0 */
+
+  /* USER CODE END TIM1_UP_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim1);
+  /* USER CODE BEGIN TIM1_UP_IRQn 1 */
+
+  /* USER CODE END TIM1_UP_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
   // LOG("CAN transmisison complete");
+  // canpybara_can_tx_ready(hcan);
 }
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
@@ -303,6 +319,13 @@ void HAL_RCC_CSSCallback(void)
 {
   LOG("Ceramic resonator has failed");
 }
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  // LOG("Timer");
+  canpybara_gpio_report_input();
+}
+
 
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

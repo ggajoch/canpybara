@@ -83,7 +83,7 @@ void canpybara_test_sequence(void)
 
 	// LOG("ADDR");
 	// canpybara_test_zeroout();
-	// for(p = 0; p < 100; p++) 
+	// for(;;) 
 	// {
 	// 	for (i = 0; i < INPUTS_ADDR_LEN; ++i)
 	// 	{
@@ -104,19 +104,19 @@ void canpybara_test_sequence(void)
 
 	for(;;)
 	{
-		CanTxMsgTypeDef* CanTx = hcan.pTxMsg;
-		CanTx->StdId = 0x01;
-		CanTx->ExtId = 0;
-		CanTx->IDE = CAN_ID_STD;
-		CanTx->RTR = CAN_RTR_DATA;
-		CanTx->DLC = 1;
-		CanTx->Data[0] = 0x55;
-		HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(&hcan);
-		if(result != HAL_OK)
-		{
-			LOG("Transmitting CAN status: %d", result);
-			LOG(" ESR register: %"PRIu32, HAL_CAN_GetError(&hcan));
-		}
+		// CanTxMsgTypeDef* CanTx = hcan.pTxMsg;
+		// CanTx->StdId = 0x01;
+		// CanTx->ExtId = 0;
+		// CanTx->IDE = CAN_ID_STD;
+		// CanTx->RTR = CAN_RTR_DATA;
+		// CanTx->DLC = 1;
+		// CanTx->Data[0] = 0x55;
+		// HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(&hcan);
+		// if(result != HAL_OK)
+		// {
+		// 	LOG("Transmitting CAN status: %d", result);
+		// 	LOG(" ESR register: %"PRIu32, HAL_CAN_GetError(&hcan));
+		// }
 			
 
 		// for (i = 0; i < 10; ++i)

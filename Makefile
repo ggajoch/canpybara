@@ -57,7 +57,8 @@ Core/Src/system_stm32f1xx.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Core/Src/logger.c \
 Core/Src/test.c \
-Core/Src/can.c 
+Core/Src/can.c \
+Core/Src/gpio.c
 
 # ASM sources
 ASM_SOURCES =  \
