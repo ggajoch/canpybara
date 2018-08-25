@@ -223,7 +223,7 @@ void USB_HP_CAN1_TX_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_HP_CAN1_TX_IRQn 0 */
 
-  LOG("CAN1 TX IRQ");
+  // LOG("CAN1 TX IRQ");
 
   /* USER CODE END USB_HP_CAN1_TX_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
@@ -239,7 +239,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
 
-  LOG("CAN1 RX0 IRQ");
+  // LOG("CAN1 RX0 IRQ");
 
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
@@ -255,7 +255,7 @@ void CAN1_RX1_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN1_RX1_IRQn 0 */
 
-  LOG("CAN1 RX1 IRQ");
+  // LOG("CAN1 RX1 IRQ");
 
   /* USER CODE END CAN1_RX1_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
@@ -271,7 +271,7 @@ void CAN1_SCE_IRQHandler(void)
 {
   /* USER CODE BEGIN CAN1_SCE_IRQn 0 */
 
-  LOG("CAN1 SCE IRQ");
+  // LOG("CAN1 SCE IRQ");
 
   /* USER CODE END CAN1_SCE_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
@@ -284,12 +284,12 @@ void CAN1_SCE_IRQHandler(void)
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
-  LOG("CAN transmisison complete");
+  // LOG("CAN transmisison complete");
 }
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
-  LOG("Received CAN message");
+  // LOG("Received CAN message");
 
   canpybara_can_rx(hcan);
 }

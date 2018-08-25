@@ -26,14 +26,22 @@ void canpybara_configure_filters(CAN_HandleTypeDef* hcan)
 
 	HAL_StatusTypeDef result = HAL_CAN_ConfigFilter(hcan, &filter_config);
 
-	LOG("Configuring CAN filters: %s, status: %d", result == HAL_OK ? "OK" : "FAILED", result);
+	if(result != HAL_OK)
+	{
+		LOG("Configuring CAN filters status: %d", result);
+		_Error_Handler(__FILE__, __LINE__);
+	}
 }
 
 void canpybara_reload_canrx(CAN_HandleTypeDef* hcan)
 {
 	HAL_StatusTypeDef result = HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
 
-	LOG("CAN_Receive_IT called: %s status: %d", result == HAL_OK ? "OK" : "FAILED", result);
+	if(result != HAL_OK)
+	{
+		LOG("CAN_Receive_IT called status: %d", result);
+		_Error_Handler(__FILE__, __LINE__);
+	}
 }
 
 void canpybara_can_init(void)
@@ -50,6 +58,31 @@ void canpybara_can_init(void)
 
 void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 {
+	// hcan->pRxMsg->StdId |= 1<<5;
+
+	// if(hcan->pRxMsg->StdId )
+	// {
+	// 	LOG("Rcv byte: %d", (int)hcan->pRxMsg->Data[0]);
+	// }
+
+	hcan->pTxMsg->StdId = hcan->pRxMsg->StdId | 1<<10;
+	hcan->pTxMsg->ExtId = 0;
+	hcan->pTxMsg->IDE = CAN_ID_STD;
+	hcan->pTxMsg->RTR = CAN_RTR_DATA;
+	hcan->pTxMsg->DLC = hcan->pRxMsg->DLC;
+	int i;
+	for (i = 0; i < hcan->pRxMsg->DLC; ++i)
+	{
+		hcan->pTxMsg->Data[i] = hcan->pRxMsg->Data[i];
+	}
+	// hcan->pTxMsg->Data[0] = 0x55;
+
+	HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(hcan);
+	if(result != HAL_OK)
+	{
+		LOG("Reply to CAN msg result: %d", result);
+		_Error_Handler(__FILE__, __LINE__);
+	}
 	
 	canpybara_reload_canrx(hcan);
 }

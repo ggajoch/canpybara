@@ -100,24 +100,24 @@ void canpybara_test_sequence(void)
 
 	LOG("Testing sending CAN message");
 
-	CanTxMsgTypeDef* CanTx = hcan.pTxMsg;
-	CanTx->StdId = 0x01;
-	CanTx->ExtId = 0;
-	CanTx->IDE = CAN_ID_STD;
-	CanTx->RTR = CAN_RTR_DATA;
-	CanTx->DLC = 1;
-	CanTx->Data[0] = 0x55;
 
 
 	for(;;)
 	{
-		HAL_StatusTypeDef result = HAL_CAN_Transmit(&hcan, 50);
-		// if(result != HAL_OK)
-		// {
-			LOG("Transmitting CAN: %s, status: %d", result == HAL_OK ? "OK" : "FAILED", result);
-			LOG(" ESR register: %"PRIu32, hcan.Instance->ESR);
+		CanTxMsgTypeDef* CanTx = hcan.pTxMsg;
+		CanTx->StdId = 0x01;
+		CanTx->ExtId = 0;
+		CanTx->IDE = CAN_ID_STD;
+		CanTx->RTR = CAN_RTR_DATA;
+		CanTx->DLC = 1;
+		CanTx->Data[0] = 0x55;
+		HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(&hcan);
+		if(result != HAL_OK)
+		{
+			LOG("Transmitting CAN status: %d", result);
+			LOG(" ESR register: %"PRIu32, HAL_CAN_GetError(&hcan));
+		}
 			
-		// }
 
 		// for (i = 0; i < 10; ++i)
 		// {
