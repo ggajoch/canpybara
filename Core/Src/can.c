@@ -1,6 +1,7 @@
 #include "main.h"
 #include "logger.h"
 #include "can.h"
+#include "version.h"
 
 #include "stm32f1xx_hal.h"
 
@@ -11,47 +12,6 @@ CanTxMsgTypeDef hcan_CAN_Tx;
 CanRxMsgTypeDef hcan_CAN_Rx0;
 CanRxMsgTypeDef hcan_CAN_Rx1;
 
-
-
-// struct canpybara_can_pending_message
-// {
-// 	uint8_t enabled : 1;
-// 	uint8_t sending : 1;
-	
-// 	CanTxMsgTypeDef message;
-// };
-
-// #define MESSAGE_QUEUE_LENGTH 8
-// struct canpybara_can_pending_message message_queue[MESSAGE_QUEUE_LENGTH];
-
-// void canpybara_mesage_queue_clear(void)
-// {
-// 	int i;
-
-// 	for (i = 0; i < MESSAGE_QUEUE_LENGTH; ++i)
-// 	{
-// 		message_queue[i].enabled = 0;
-// 		message_queue[i].sending = 0;
-// 	}
-// }
-
-// void canpybara_send_message(CanTxMsgTypeDef *message)
-// {
-// 	int i;
-
-// 	for (i = 0; i < MESSAGE_QUEUE_LENGTH; ++i)
-// 	{
-// 		struct canpybara_can_pending_message *item = message_queue + i;
-
-// 		if(item->enabled == 0 && item->sending == 0)
-// 		{
-// 			item->message = *message;
-// 			item->enabled = 1;
-
-// 			return;
-// 		}
-// 	}
-// }
 
 uint16_t canpybara_can_get_my_address(void)
 {
@@ -79,33 +39,19 @@ uint16_t canpybara_can_get_my_address(void)
 	return result;
 }
 
-// void canpybara_can_tx_ready(CAN_HandleTypeDef* hcan)
-// {
-// 	int i;
+uint16_t canpybara_tx_frames = 0;
+uint16_t canpybara_rx_frames = 0;
+uint16_t canpybara_errors = 0;
 
-// 	for (i = 0; i < MESSAGE_QUEUE_LENGTH; ++i)
-// 	{
-// 		if(message_queue[i].sending)
-// 		{
-// 			message_queue[i].sending = 0;
-// 		}
+void canpybara_can_tx_complete(void)
+{
+	canpybara_tx_frames++;
+}
 
-// 		if(message_queue[i].enabled)
-// 		{
-// 			hcan->pTxMsg = &message_queue[i].message;
-
-// 			message_queue[i].sending = 1;
-// 			message_queue[i].enabled = 0;
-
-// 			HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(hcan);
-// 			if(result != HAL_OK)
-// 			{
-// 				LOG("HAL_CAN_Transmit_IT called status: %d", result);
-// 				_Error_Handler(__FILE__, __LINE__);
-// 			}
-// 		}
-// 	}
-// }
+void canpybara_can_error(void)
+{
+	canpybara_errors++;
+}
 
 void canpybara_configure_filters(CAN_HandleTypeDef* hcan)
 {
@@ -116,13 +62,15 @@ void canpybara_configure_filters(CAN_HandleTypeDef* hcan)
 	filter_config.FilterMode = CAN_FILTERMODE_IDMASK;
 	filter_config.FilterScale = CAN_FILTERSCALE_16BIT;
 
+	// 5 for matching STDID
+
 	// Filter 1 : My addr
 	filter_config.FilterIdHigh = my_address << 5;
-	filter_config.FilterMaskIdHigh = 0x8FE0;
+	filter_config.FilterMaskIdHigh = CANPYBARA_DEVICE_ADDR_BITMASK;
 
 	// Filter 2 : Addr 0
 	filter_config.FilterIdLow = 0x000 << 5;
-	filter_config.FilterMaskIdLow = 0xFFFF;
+	filter_config.FilterMaskIdLow = CANPYBARA_DEVICE_ADDR_BITMASK;
 
 	filter_config.FilterFIFOAssignment = CAN_FILTER_FIFO0;
 	filter_config.FilterActivation = ENABLE;
@@ -152,50 +100,69 @@ void canpybara_can_init(void)
 {
 	LOG("Initializing CAN");
 
-	// hcan.pTxMsg = &hcan_CAN_Tx;
 	hcan.pRxMsg = &hcan_CAN_Rx0;
 	hcan.pRx1Msg = &hcan_CAN_Rx1;
-
-	// canpybara_mesage_queue_clear();
 
 	canpybara_configure_filters(&hcan);
 	canpybara_reload_canrx(&hcan);
 }
 
+void capybara_can_report_status(void)
+{
+	static CanTxMsgTypeDef can_tx;
+	can_tx.StdId = CANPYBARA_REPORT_STATUS;
+	can_tx.ExtId = 0;
+	can_tx.IDE = CAN_ID_STD;
+	can_tx.RTR = CAN_RTR_DATA;
+
+	can_tx.DLC = 7;
+	int i = 0;
+	can_tx.Data[i++] = 0x00; // normal mode
+
+	// TX
+	can_tx.Data[i++] = canpybara_tx_frames >> 8;
+	can_tx.Data[i++] = canpybara_tx_frames;
+
+	// RX
+	can_tx.Data[i++] = canpybara_rx_frames >> 8;
+	can_tx.Data[i++] = canpybara_rx_frames;
+
+	// ERR
+	can_tx.Data[i++] = canpybara_errors >> 8;
+	can_tx.Data[i++] = canpybara_errors;
+
+	canpybara_can_tx(&can_tx);
+}
+
 void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 {
-	// hcan->pRxMsg->StdId |= 1<<5;
-
-	// if(hcan->pRxMsg->StdId )
-	// {
-	// 	LOG("Rcv byte: %d", (int)hcan->pRxMsg->Data[0]);
-	// }
-
-	// hcan->pTxMsg->StdId = hcan->pRxMsg->StdId | 1<<10;
-	// hcan->pTxMsg->ExtId = 0;
-	// hcan->pTxMsg->IDE = CAN_ID_STD;
-	// hcan->pTxMsg->RTR = CAN_RTR_DATA;
-	// hcan->pTxMsg->DLC = hcan->pRxMsg->DLC;
-	// int i;
-	// for (i = 0; i < hcan->pRxMsg->DLC; ++i)
-	// {
-	// 	hcan->pTxMsg->Data[i] = hcan->pRxMsg->Data[i];
-	// }
-
-	// HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(hcan);
-	// if(result != HAL_OK)
-	// {
-	// 	LOG("Reply to CAN msg result: %d", result);
-	// 	_Error_Handler(__FILE__, __LINE__);
-	// }
+	canpybara_rx_frames++;
 
 	int request_id = CANPYBARA_CONTROLLER_REQUESTID(hcan->pRxMsg->StdId);
 
-	// LOG("Request id: %d for %"PRIu32, request_id, hcan->pRxMsg->StdId);
+	LOG("Request id: %d for %"PRIu32, request_id, hcan->pRxMsg->StdId);
 
 	switch(request_id)
 	{
-		case CANPYBARA_REPORT_OUTSET:
+		case CANPYBARA_REQUEST_VERSIONINFO:
+			if (hcan->pRxMsg->RTR == CAN_RTR_REMOTE)
+			{
+				canpybara_version_report();
+			}
+			break;
+		case CANPYBARA_REQUEST_STATUS:
+			if (hcan->pRxMsg->RTR == CAN_RTR_REMOTE)
+			{
+				capybara_can_report_status();
+			}
+			break;
+		case CANPYBARA_REQUEST_INRD:
+			if (hcan->pRxMsg->RTR == CAN_RTR_REMOTE)
+			{
+				canpybara_gpio_report();
+			}
+			break;
+		case CANPYBARA_REQUEST_OUTSET:
 			if(hcan->pRxMsg->DLC == 1)
 			{
 				canpybara_gpio_handle_outset(hcan->pRxMsg->Data[0]);
@@ -205,10 +172,21 @@ void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 				canpybara_gpio_handle_outrdreq();
 			}
 			break;
-			default:
 
+		default:
 			LOG("Unknown request ID: %d", request_id);
 	}
 	
 	canpybara_reload_canrx(hcan);
+}
+
+
+void canpybara_can_tx(CanTxMsgTypeDef *can_tx)
+{
+	hcan.pTxMsg = can_tx;
+
+	if(HAL_CAN_Transmit(&hcan, 50) != HAL_OK)
+	{
+		LOG("Can transmit failure");
+	}
 }

@@ -7,7 +7,6 @@ extern CAN_HandleTypeDef hcan;
 
 void canpybara_gpio_report(void)
 {
-
 	uint8_t port_status = 0;
 
 	uint16_t INPUTS[] = {IN0_Pin, IN1_Pin, IN2_Pin, IN3_Pin, IN4_Pin, IN5_Pin};
@@ -23,18 +22,15 @@ void canpybara_gpio_report(void)
 		}
 	}
 
-	static CanTxMsgTypeDef CanTx;
-	CanTx.StdId = CANPYBARA_REPORT_INRD;
-	CanTx.ExtId = 0;
-	CanTx.IDE = CAN_ID_STD;
-	CanTx.RTR = CAN_RTR_DATA;
-	CanTx.DLC = 1;
-	CanTx.Data[0] = port_status;
+	static CanTxMsgTypeDef can_tx;
+	can_tx.StdId = CANPYBARA_REPORT_INRD;
+	can_tx.ExtId = 0;
+	can_tx.IDE = CAN_ID_STD;
+	can_tx.RTR = CAN_RTR_DATA;
+	can_tx.DLC = 1;
+	can_tx.Data[0] = port_status;
 
-	hcan.pTxMsg = &CanTx;
-	HAL_CAN_Transmit(&hcan, 50);
-
-	// canpybara_gpio_handle_outrdreq();
+	canpybara_can_tx(&can_tx);
 }
 
 static uint16_t OUTPUTS[] = { OUT0_Pin, OUT1_Pin, OUT2_Pin, OUT3_Pin, OUT4_Pin, OUT5_Pin, RELAY0_Pin, RELAY1_Pin };
@@ -62,14 +58,13 @@ void canpybara_gpio_handle_outrdreq(void)
 		}
 	}
 
-	static CanTxMsgTypeDef CanTx;
-	CanTx.StdId = CANPYBARA_REPORT_OUTRD;
-	CanTx.ExtId = 0;
-	CanTx.IDE = CAN_ID_STD;
-	CanTx.RTR = CAN_RTR_DATA;
-	CanTx.DLC = 1;
-	CanTx.Data[0] = port_status;
+	static CanTxMsgTypeDef can_tx;
+	can_tx.StdId = CANPYBARA_REPORT_OUTRD;
+	can_tx.ExtId = 0;
+	can_tx.IDE = CAN_ID_STD;
+	can_tx.RTR = CAN_RTR_DATA;
+	can_tx.DLC = 1;
+	can_tx.Data[0] = port_status;
 
-	hcan.pTxMsg = &CanTx;
-	HAL_CAN_Transmit(&hcan, 50);
+	canpybara_can_tx(&can_tx);
 }

@@ -4,7 +4,7 @@
   * @brief   Interrupt Service Routines.
   ******************************************************************************
   *
-  * COPYRIGHT(c) 2018 STMicroelectronics
+  * COPYRIGHT(c) 2019 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -301,6 +301,7 @@ void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
   // LOG("CAN transmisison complete");
   // canpybara_can_tx_ready(hcan);
+  canpybara_can_tx_complete();
 }
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
@@ -312,7 +313,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
-  LOG("CAN error");
+  canpybara_can_error();
+  // LOG("CAN error");
 }
 
 void HAL_RCC_CSSCallback(void)
@@ -323,7 +325,7 @@ void HAL_RCC_CSSCallback(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   // LOG("Timer");
-  canpybara_gpio_report();
+  // canpybara_gpio_report();
 }
 
 

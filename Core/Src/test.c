@@ -41,89 +41,87 @@ void canpybara_test_sequence(void)
 	int q = 0;
 	int p = 0;
 	
-	// LOG("Animation 0->full full->0");
+	LOG("Animation 0->full full->0");
 	
-	// HAL_IWDG_Refresh(&hiwdg);
+	HAL_IWDG_Refresh(&hiwdg);
 
-	// canpybara_test_zeroout();
-	// for(p = 0; p < 3; p++)
-	// {
-	// 	for (i = 0; i < OUTPUTS_LEN; ++i)
-	// 	{
-	// 		HAL_GPIO_TogglePin(OUTPUTS_PORT[i], OUTPUTS[i]);
+	canpybara_test_zeroout();
+	for(p = 0; p < 3; p++)
+	{
+		for (i = 0; i < OUTPUTS_LEN; ++i)
+		{
+			HAL_GPIO_TogglePin(OUTPUTS_PORT[i], OUTPUTS[i]);
 
-	// 		HAL_Delay(100);
-	// 	}
+			HAL_Delay(100);
+		}
 
-	// 	HAL_IWDG_Refresh(&hiwdg);
-	// 	for (i = 0; i < OUTPUTS_LEN; ++i)
-	// 	{
-	// 		HAL_GPIO_TogglePin(OUTPUTS_PORT[i], OUTPUTS[i]);
+		HAL_IWDG_Refresh(&hiwdg);
+		for (i = 0; i < OUTPUTS_LEN; ++i)
+		{
+			HAL_GPIO_TogglePin(OUTPUTS_PORT[i], OUTPUTS[i]);
 
-	// 		HAL_Delay(100);
-	// 	}
-	// 	HAL_IWDG_Refresh(&hiwdg);
-	// }
+			HAL_Delay(100);
+		}
+		HAL_IWDG_Refresh(&hiwdg);
+	}
 
-	// LOG("IN -> OUT");
-	// canpybara_test_zeroout();
-	// HAL_GPIO_WritePin(RELAY1_GPIO_Port, RELAY1_Pin, GPIO_PIN_SET);
-	// for(p = 0; p < 500; p++) 
-	// {
-	// 	for (i = 0; i < INPUTS_LEN; ++i)
-	// 	{
-	// 		HAL_GPIO_WritePin(OUTPUTS_PORT[i], OUTPUTS[i], HAL_GPIO_ReadPin(INPUTS_PORT[i], INPUTS[i]));
+	LOG("IN -> OUT");
+	canpybara_test_zeroout();
+	HAL_GPIO_WritePin(RELAY1_GPIO_Port, RELAY1_Pin, GPIO_PIN_SET);
+	for(p = 0; p < 500; p++) 
+	{
+		for (i = 0; i < INPUTS_LEN; ++i)
+		{
+			HAL_GPIO_WritePin(OUTPUTS_PORT[i], OUTPUTS[i], HAL_GPIO_ReadPin(INPUTS_PORT[i], INPUTS[i]));
 
-	// 		LOG("IN %d -> %d", i, HAL_GPIO_ReadPin(INPUTS_PORT[i], INPUTS[i]));
-	// 	}
+			LOG("IN %d -> %d", i, HAL_GPIO_ReadPin(INPUTS_PORT[i], INPUTS[i]));
+		}
 
-	// 	HAL_Delay(10);
-	// 	HAL_IWDG_Refresh(&hiwdg);
-	// }
+		HAL_Delay(10);
+		HAL_IWDG_Refresh(&hiwdg);
+	}
 
-	// LOG("ADDR");
-	// canpybara_test_zeroout();
-	// for(;;) 
-	// {
-	// 	for (i = 0; i < INPUTS_ADDR_LEN; ++i)
-	// 	{
-	// 		HAL_GPIO_WritePin(OUTPUTS_PORT[i], OUTPUTS[i], HAL_GPIO_ReadPin(INPUTS_ADDR_PORT[i], INPUTS_ADDR[i]));
+	LOG("ADDR");
+	canpybara_test_zeroout();
+	for(;;) 
+	{
+		for (i = 0; i < INPUTS_ADDR_LEN; ++i)
+		{
+			HAL_GPIO_WritePin(OUTPUTS_PORT[i], OUTPUTS[i], HAL_GPIO_ReadPin(INPUTS_ADDR_PORT[i], INPUTS_ADDR[i]));
 
-	// 		LOG("ADDR %d -> %d", i, HAL_GPIO_ReadPin(INPUTS_ADDR_PORT[i], INPUTS_ADDR[i]));
-	// 	}
+			LOG("ADDR %d -> %d", i, HAL_GPIO_ReadPin(INPUTS_ADDR_PORT[i], INPUTS_ADDR[i]));
+		}
 
-	// 	HAL_Delay(100);
-	// 	HAL_IWDG_Refresh(&hiwdg);
-	// }
+		HAL_Delay(100);
+		HAL_IWDG_Refresh(&hiwdg);
+	}
 
-	// HAL_Delay(100);
+	HAL_Delay(100);
 
 	LOG("Testing sending CAN message");
 
-
-
 	for(;;)
 	{
-		// CanTxMsgTypeDef* CanTx = hcan.pTxMsg;
-		// CanTx->StdId = 0x01;
-		// CanTx->ExtId = 0;
-		// CanTx->IDE = CAN_ID_STD;
-		// CanTx->RTR = CAN_RTR_DATA;
-		// CanTx->DLC = 1;
-		// CanTx->Data[0] = 0x55;
-		// HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(&hcan);
-		// if(result != HAL_OK)
-		// {
-		// 	LOG("Transmitting CAN status: %d", result);
-		// 	LOG(" ESR register: %"PRIu32, HAL_CAN_GetError(&hcan));
-		// }
+		CanTxMsgTypeDef* CanTx = hcan.pTxMsg;
+		CanTx->StdId = 0x01;
+		CanTx->ExtId = 0;
+		CanTx->IDE = CAN_ID_STD;
+		CanTx->RTR = CAN_RTR_DATA;
+		CanTx->DLC = 1;
+		CanTx->Data[0] = 0x55;
+		HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(&hcan);
+		if(result != HAL_OK)
+		{
+			LOG("Transmitting CAN status: %d", result);
+			LOG(" ESR register: %"PRIu32, HAL_CAN_GetError(&hcan));
+		}
 			
 
-		// for (i = 0; i < 10; ++i)
-		// {
+		for (i = 0; i < 10; ++i)
+		{
 			HAL_IWDG_Refresh(&hiwdg);
 			HAL_Delay(1000);
-		// }
+		}
 	}
 
 	HAL_Delay(100);

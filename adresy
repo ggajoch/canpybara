@@ -1,0 +1,56 @@
+$ cat cancrap 
+ 0 0 0 0 0 0 0 0 0 0 0
+
+ 
+CONTROLLER -> ALLREADER
+ 0 T T T T 0 0 0 0 0 0
+
+ 
+CONTROLLER -> READER
+ 0 T T T T X X X X X X
+
+
+CONTROLLER <- READER
+ 1 T T T T X X X X X X
+ 
+
+T T T T
+-------
+0 0 0 0
+       <-  VERSIONINFO
+           Wersja, info, bardziej dla ludzi, 8 znakow
+ 
+0 0 0 1
+        -> STATUSREQ [RTR]
+       <-  STATUS
+           00   00 00 00 00 00 00
+           ^       TX    RX    ERR
+           | 
+            - mode (00 - normal, 01 - bootloader)
+ 
+0 0 1 0
+        -> INRDREQ [RTR]
+       <-  INRD
+           00
+           ^- stan portu (8 bitow)
+0 0 1 1
+        -> OUTRDREQ [RTR]
+        -> OUTSET
+           00 
+           ^- nowy stan portu
+       <-  OUTRD
+           00 
+           ^- stan portu
+ 
+0 1 0 0
+        -> SCANRESP
+           00 - OK
+           01 - REJECT
+
+       <-  SCAN
+           00 00 00 00
+           ^- id breloczka
+0 1 0 1
+       <- BTNCLICK
+          00
+          ^- id przycisku
