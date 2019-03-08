@@ -38,6 +38,8 @@
 /* USER CODE BEGIN 0 */
 
 #include "logger.h"
+#include "gpio.h"
+#include "can.h"
 
 /* USER CODE END 0 */
 
@@ -218,6 +220,34 @@ void RCC_IRQHandler(void)
 }
 
 /**
+* @brief This function handles EXTI line0 interrupt.
+*/
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
+}
+
+/**
+* @brief This function handles EXTI line1 interrupt.
+*/
+void EXTI1_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI1_IRQn 0 */
+
+  /* USER CODE END EXTI1_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+  /* USER CODE BEGIN EXTI1_IRQn 1 */
+
+  /* USER CODE END EXTI1_IRQn 1 */
+}
+
+/**
 * @brief This function handles USB high priority or CAN TX interrupts.
 */
 void USB_HP_CAN1_TX_IRQHandler(void)
@@ -325,9 +355,13 @@ void HAL_RCC_CSSCallback(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   // LOG("Timer");
-  // canpybara_gpio_report();
+  canpybara_gpio_report();
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  canpybara_gpio_interrupt(GPIO_Pin);
+}
 
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

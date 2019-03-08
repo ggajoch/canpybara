@@ -2,6 +2,7 @@
 #include "logger.h"
 #include "can.h"
 #include "version.h"
+#include "gpio.h"
 
 #include "stm32f1xx_hal.h"
 
@@ -188,5 +189,8 @@ void canpybara_can_tx(CanTxMsgTypeDef *can_tx)
 	if(HAL_CAN_Transmit(&hcan, 50) != HAL_OK)
 	{
 		LOG("Can transmit failure");
+		canpybara_can_error();
 	}
+
+	canpybara_can_tx_complete();
 }

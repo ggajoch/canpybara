@@ -65,8 +65,10 @@
 #define ADDR6_GPIO_Port GPIOA
 #define IN0_Pin GPIO_PIN_0
 #define IN0_GPIO_Port GPIOB
+#define IN0_EXTI_IRQn EXTI0_IRQn
 #define IN1_Pin GPIO_PIN_1
 #define IN1_GPIO_Port GPIOB
+#define IN1_EXTI_IRQn EXTI1_IRQn
 #define IN2_Pin GPIO_PIN_2
 #define IN2_GPIO_Port GPIOB
 #define OUT2_Pin GPIO_PIN_10

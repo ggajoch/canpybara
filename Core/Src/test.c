@@ -38,7 +38,6 @@ void canpybara_test_sequence(void)
 {
 	size_t i;
 
-	int q = 0;
 	int p = 0;
 	
 	LOG("Animation 0->full full->0");
@@ -68,7 +67,7 @@ void canpybara_test_sequence(void)
 	LOG("IN -> OUT");
 	canpybara_test_zeroout();
 	HAL_GPIO_WritePin(RELAY1_GPIO_Port, RELAY1_Pin, GPIO_PIN_SET);
-	for(p = 0; p < 500; p++) 
+	for(p = 0; p < 500; p++)
 	{
 		for (i = 0; i < INPUTS_LEN; ++i)
 		{
@@ -83,7 +82,6 @@ void canpybara_test_sequence(void)
 
 	LOG("ADDR");
 	canpybara_test_zeroout();
-	for(;;) 
 	{
 		for (i = 0; i < INPUTS_ADDR_LEN; ++i)
 		{
@@ -109,7 +107,7 @@ void canpybara_test_sequence(void)
 		CanTx->RTR = CAN_RTR_DATA;
 		CanTx->DLC = 1;
 		CanTx->Data[0] = 0x55;
-		HAL_StatusTypeDef result = HAL_CAN_Transmit_IT(&hcan);
+		HAL_StatusTypeDef result = HAL_CAN_Transmit(&hcan, 50);
 		if(result != HAL_OK)
 		{
 			LOG("Transmitting CAN status: %d", result);

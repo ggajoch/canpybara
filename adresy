@@ -13,6 +13,7 @@ CONTROLLER -> READER
 CONTROLLER <- READER
  1 T T T T X X X X X X
  
+ 1 0 0 0 0 1 1 1 1 1 1
 
 T T T T
 -------
@@ -50,7 +51,13 @@ T T T T
        <-  SCAN
            00 00 00 00
            ^- id breloczka
+
 0 1 0 1
        <- BTNCLICK
           00
           ^- id przycisku
+
+0 1 1 0
+       <- GPIO INTERRUPT
+          00
+          PIN 

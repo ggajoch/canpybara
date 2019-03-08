@@ -3,6 +3,8 @@
 #include "can.h"
 #include "logger.h"
 
+#include <inttypes.h>
+
 extern CAN_HandleTypeDef hcan;
 
 void canpybara_gpio_report(void)
@@ -67,4 +69,9 @@ void canpybara_gpio_handle_outrdreq(void)
 	can_tx.Data[0] = port_status;
 
 	canpybara_can_tx(&can_tx);
+}
+
+void canpybara_gpio_interrupt(uint16_t GPIO_Pin)
+{
+	LOG("GPIO Interrupt: %"PRIu16, GPIO_Pin);
 }
