@@ -40,6 +40,7 @@
 #include "logger.h"
 #include "gpio.h"
 #include "can.h"
+#include "wiegand.h"
 
 /* USER CODE END 0 */
 
@@ -360,7 +361,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+  #ifdef WIEGAND_ENABLED
+  canpybara_wiegand_pin_pulse_interrupt(GPIO_Pin == IN1_Pin ? 1 : 0);
+  #warning Wiegand enabled: GPIO interrupt will be disabled
+  #else
   canpybara_gpio_interrupt(GPIO_Pin);
+  #endif
+}
+
+void HAL_SYSTICK_Callback(void)
+{
+  #ifdef WIEGAND_ENABLED
+  canpybara_wiegand_systick_interrupt();
+  #endif
 }
 
 /* USER CODE END 1 */

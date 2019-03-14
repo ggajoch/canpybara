@@ -60,6 +60,7 @@ Core/Src/test.c \
 Core/Src/can.c \
 Core/Src/gpio.c \
 Core/Src/version.c \
+Core/Src/wiegand.c \
 
 # ASM sources
 ASM_SOURCES =  \

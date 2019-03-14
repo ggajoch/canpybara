@@ -1,9 +1,11 @@
 #include <stdint.h>
 
-int wiegand_position;
-uint32_t wiegand_buffer;
+#include "logger.h"
+#include "wiegand.h"
 
-#define WIEGAND_BUFFER_BIT_LENGTH sizeof(wiegand_buffer)*8
+unsigned int wiegand_position;
+uint32_t wiegand_buffer;
+uint32_t wiegand_timeout;
 
 void canpybara_wiegand_reset(void)
 {
@@ -11,11 +13,53 @@ void canpybara_wiegand_reset(void)
 	wiegand_buffer = 0;
 }
 
+void canpybara_wiegand_process_card(void)
+{
 
-void canpybara_wiegand_pin_pulse(int bit)
+}
+
+void canpybara_wiegand_process_keypress(void)
+{
+
+}
+
+void canpybara_wiegand_process_scan(void)
+{
+	switch(wiegand_position)
+	{
+		case WIEGAND_CARD_LENGTH:
+			canpybara_wiegand_process_card();
+			break;
+		case WIEGAND_KEYPRESS_LENGTH:
+			canpybara_wiegand_process_keypress();
+			break;
+		default:
+			LOG("Unknown WIEGAND message");
+	}
+}
+
+void canpybara_wiegand_pin_pulse_interrupt(int bit)
 {
 	wiegand_buffer |= bit << (WIEGAND_BUFFER_BIT_LENGTH -1 - wiegand_position);
 	wiegand_position ++;
+
+	wiegand_timeout = 0;
+}
+
+void canpybara_wiegand_systick_interrupt(void)
+{
+	if(wiegand_timeout > WIEGAND_TIMEOUT)
+	{
+		if(wiegand_position)
+		{
+			canpybara_wiegand_process_scan();
+		}
+		canpybara_wiegand_reset();
+	}
+	else
+	{
+		wiegand_timeout ++;
+	}
 }
 
 
@@ -67,5 +111,3 @@ uint8_t canpybara_wiegand_is_valid(void)
 
 	return 1;
 }
-
-
