@@ -2,6 +2,10 @@
 
 #include "logger.h"
 #include "wiegand.h"
+#include "can.h"
+
+uint8_t canpybara_wiegand_is_valid(void);
+static uint32_t canpybara_wiegand_strip_parity_bits(uint32_t input);
 
 unsigned int wiegand_position;
 uint32_t wiegand_buffer;
@@ -13,18 +17,70 @@ void canpybara_wiegand_reset(void)
 	wiegand_buffer = 0;
 }
 
+uint32_t uint32_reverse(uint32_t x)
+{
+    x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
+    x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
+    x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
+    x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
+    x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
+    return x;
+}
+
 void canpybara_wiegand_process_card(void)
 {
+	static CanTxMsgTypeDef can_tx;
+	can_tx.StdId = CANPYBARA_REPORT_SCAN;
+	can_tx.ExtId = 0;
+	can_tx.IDE = CAN_ID_STD;
+	can_tx.RTR = CAN_RTR_DATA;
 
+	can_tx.DLC = 3;
+	int i = 0;
+
+	wiegand_buffer = uint32_reverse(wiegand_buffer);
+
+	can_tx.Data[i++] = wiegand_buffer >> 24; 
+	can_tx.Data[i++] = wiegand_buffer >> 16;
+	can_tx.Data[i++] = wiegand_buffer >> 8;
+
+	canpybara_can_tx(&can_tx);
 }
 
 void canpybara_wiegand_process_keypress(void)
 {
+	LOG("Key ID: %u", wiegand_buffer);
 
+	static CanTxMsgTypeDef can_tx;
+	can_tx.StdId = CANPYBARA_REPORT_BTNCLICK;
+	can_tx.ExtId = 0;
+	can_tx.IDE = CAN_ID_STD;
+	can_tx.RTR = CAN_RTR_DATA;
+
+	can_tx.DLC = 1;
+	int i = 0;
+
+	wiegand_buffer = uint32_reverse(wiegand_buffer);
+
+	can_tx.Data[i++] = wiegand_buffer >> 28;
+
+	canpybara_can_tx(&can_tx);
 }
 
 void canpybara_wiegand_process_scan(void)
 {
+	LOG("Buff: %"PRIu32", len: %"PRIu32, wiegand_buffer, wiegand_position);
+
+	// Check if makes sense
+	if(!canpybara_wiegand_is_valid())
+	{
+		LOG("Bad wiegand checksum");
+		return;
+	}
+
+	// Strip parity bits and fix bit order
+	wiegand_buffer = canpybara_wiegand_strip_parity_bits(wiegand_buffer);
+
 	switch(wiegand_position)
 	{
 		case WIEGAND_CARD_LENGTH:
@@ -40,7 +96,12 @@ void canpybara_wiegand_process_scan(void)
 
 void canpybara_wiegand_pin_pulse_interrupt(int bit)
 {
-	wiegand_buffer |= bit << (WIEGAND_BUFFER_BIT_LENGTH -1 - wiegand_position);
+	if(wiegand_position > WIEGAND_MAX_LENGTH)
+	{
+		return;
+	}
+
+	wiegand_buffer |= bit << wiegand_position;
 	wiegand_position ++;
 
 	wiegand_timeout = 0;
@@ -97,17 +158,27 @@ uint8_t canpybara_wiegand_is_valid(void)
 
 	parity_calc = canpybara_wiegand_parity_calc(wiegand_buffer, 0, bitstream_length_2+1);
 
-	if(parity_calc != 1)
+	if(parity_calc != 0)
 	{
 		return 0;
 	}
 
 	parity_calc = canpybara_wiegand_parity_calc(wiegand_buffer, bitstream_length_2+1, bitstream_length_2+1);
 
-	if(parity_calc != 0)
+	if(parity_calc != 1)
 	{
 		return 0;
 	}
 
 	return 1;
+}
+
+/**
+ * This quite magic function will shift 1 bit to right and zero-out
+ * last bit in message (removes parity bits from message)
+ */
+static uint32_t canpybara_wiegand_strip_parity_bits(uint32_t input)
+{
+	uint32_t mask = (~(1<<(wiegand_position-1)));
+	return (wiegand_buffer & mask)>>1;
 }

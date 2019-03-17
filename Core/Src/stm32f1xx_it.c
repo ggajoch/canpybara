@@ -47,6 +47,7 @@
 /* External variables --------------------------------------------------------*/
 extern CAN_HandleTypeDef hcan;
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
 
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
@@ -326,6 +327,20 @@ void TIM1_UP_IRQHandler(void)
   /* USER CODE END TIM1_UP_IRQn 1 */
 }
 
+/**
+* @brief This function handles TIM2 global interrupt.
+*/
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
@@ -353,17 +368,42 @@ void HAL_RCC_CSSCallback(void)
   LOG("Ceramic resonator has failed");
 }
 
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  // LOG("Timer");
-  canpybara_gpio_report();
+  // Periodic CAN reports
+  if(htim == &htim1)
+  {
+    // canpybara_gpio_report();
+  }
+  
+  // Debounce filter
+  if(htim == &htim2)
+  {
+    // Enable interrupts, disable timer
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+    HAL_TIM_Base_Stop_IT(&htim2);
+
+    // HAL_GPIO_TogglePin(OUT1_GPIO_Port, OUT1_Pin);
+    HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
+  }
 }
+
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+  HAL_NVIC_DisableIRQ(EXTI1_IRQn);
+  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
+
+  __HAL_GPIO_EXTI_CLEAR_IT(IN0_Pin);
+  __HAL_GPIO_EXTI_CLEAR_IT(IN1_Pin);
+
   #ifdef WIEGAND_ENABLED
-  canpybara_wiegand_pin_pulse_interrupt(GPIO_Pin == IN1_Pin ? 1 : 0);
   #warning Wiegand enabled: GPIO interrupt will be disabled
+  canpybara_wiegand_pin_pulse_interrupt(GPIO_Pin == IN0_Pin ? 1 : 0);
   #else
   canpybara_gpio_interrupt(GPIO_Pin);
   #endif
