@@ -4,6 +4,8 @@
 #include "wiegand.h"
 #include "can.h"
 
+extern TIM_HandleTypeDef htim3;
+
 uint8_t canpybara_wiegand_is_valid(void);
 static uint32_t canpybara_wiegand_strip_parity_bits(uint32_t input);
 
@@ -61,8 +63,9 @@ void canpybara_wiegand_process_keypress(void)
 	int i = 0;
 
 	wiegand_buffer = uint32_reverse(wiegand_buffer);
+	uint8_t key_code = wiegand_buffer >> 28;
 
-	can_tx.Data[i++] = wiegand_buffer >> 28;
+	can_tx.Data[i++] = key_code;
 
 	canpybara_can_tx(&can_tx);
 }
@@ -181,4 +184,31 @@ static uint32_t canpybara_wiegand_strip_parity_bits(uint32_t input)
 {
 	uint32_t mask = (~(1<<(wiegand_position-1)));
 	return (wiegand_buffer & mask)>>1;
+}
+
+
+void canpybara_wiegand_zone_response(uint8_t response)
+{
+	if(response == 0)
+	{
+		LOG("Opening");
+		HAL_GPIO_WritePin(WIEGAND_RELAY_PORT, WIEGAND_RELAY_PIN, GPIO_PIN_SET);
+	}
+	else
+	{
+		LOG("Reject");
+		HAL_GPIO_WritePin(WIEGAND_BUZZER_PORT, WIEGAND_BUZZER_PIN, GPIO_PIN_SET);
+	}
+
+	HAL_TIM_Base_Start_IT(&htim3);
+}
+
+void canpybara_wiegand_zone_timeout(void)
+{
+    LOG("Opening/beep timeout");
+
+    HAL_TIM_Base_Stop_IT(&htim3);
+
+	HAL_GPIO_WritePin(WIEGAND_RELAY_PORT, WIEGAND_RELAY_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(WIEGAND_BUZZER_PORT, WIEGAND_BUZZER_PIN, GPIO_PIN_RESET);
 }

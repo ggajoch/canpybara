@@ -3,6 +3,7 @@
 #include "can.h"
 #include "version.h"
 #include "gpio.h"
+#include "wiegand.h"
 
 #include "stm32f1xx_hal.h"
 
@@ -118,7 +119,11 @@ void capybara_can_report_status(void)
 
 	can_tx.DLC = 7;
 	int i = 0;
+	#ifdef WIEGAND_ENABLED
+	can_tx.Data[i++] = 0x01; // wiegand
+	#else
 	can_tx.Data[i++] = 0x00; // normal mode
+	#endif
 
 	// TX
 	can_tx.Data[i++] = canpybara_tx_frames >> 8;
@@ -173,6 +178,15 @@ void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 				canpybara_gpio_handle_outrdreq();
 			}
 			break;
+
+		#ifdef WIEGAND_ENABLED
+		case CANPYBARA_REQUEST_SCANRESP:
+			if(hcan->pRxMsg->DLC == 1)
+			{
+				canpybara_wiegand_zone_response(hcan->pRxMsg->Data[0]);
+			}
+			break;
+		#endif
 
 		default:
 			LOG("Unknown request ID: %d", request_id);

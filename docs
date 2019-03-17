@@ -1,3 +1,11 @@
+Timers:
+  TIM1 - periodic can messages
+  TIM2 - debouncing timeout
+  TIM3 - zone beep/open timeout
+
+
+
+
 $ cat cancrap 
  0 0 0 0 0 0 0 0 0 0 0
 
