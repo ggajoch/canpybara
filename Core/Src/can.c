@@ -179,6 +179,10 @@ void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 			}
 			break;
 
+		case CANPYBARA_REQUEST_REBOOT:
+			for(;;);
+			break;
+
 		#ifdef WIEGAND_ENABLED
 		case CANPYBARA_REQUEST_SCANRESP:
 			if(hcan->pRxMsg->DLC == 1)
