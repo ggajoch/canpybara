@@ -180,6 +180,7 @@ void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 			break;
 
 		case CANPYBARA_REQUEST_REBOOT:
+			LOG("Received reset request...");
 			for(;;);
 			break;
 

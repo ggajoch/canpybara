@@ -389,7 +389,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Periodic CAN reports
   if(htim == &htim1)
   {
-    // canpybara_gpio_report();
+    canpybara_gpio_report();
   }
   
   // Debounce filter
