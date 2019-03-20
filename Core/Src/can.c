@@ -181,7 +181,7 @@ void canpybara_can_rx(CAN_HandleTypeDef* hcan)
 
 		case CANPYBARA_REQUEST_REBOOT:
 			LOG("Received reset request...");
-			for(;;);
+			NVIC_SystemReset();
 			break;
 
 		#ifdef WIEGAND_ENABLED
@@ -213,3 +213,4 @@ void canpybara_can_tx(CanTxMsgTypeDef *can_tx)
 
 	canpybara_can_tx_complete();
 }
+
