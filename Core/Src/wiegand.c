@@ -9,7 +9,7 @@ extern TIM_HandleTypeDef htim3;
 uint8_t canpybara_wiegand_is_valid(void);
 static uint32_t canpybara_wiegand_strip_parity_bits(uint32_t input);
 
-unsigned int wiegand_position;
+uint32_t wiegand_position;
 uint32_t wiegand_buffer;
 uint32_t wiegand_timeout;
 
@@ -51,7 +51,7 @@ void canpybara_wiegand_process_card(void)
 
 void canpybara_wiegand_process_keypress(void)
 {
-	LOG("Key ID: %u", wiegand_buffer);
+	LOG("Key ID: %"PRIu32, wiegand_buffer);
 
 	static CanTxMsgTypeDef can_tx;
 	can_tx.StdId = CANPYBARA_REPORT_BTNCLICK;
