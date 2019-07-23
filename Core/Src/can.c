@@ -89,6 +89,7 @@ void canpybara_configure_filters(CAN_HandleTypeDef* hcan)
 
 void canpybara_reload_canrx(CAN_HandleTypeDef* hcan)
 {
+	__HAL_UNLOCK(hcan);
 	HAL_StatusTypeDef result = HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
 
 	if(result != HAL_OK)

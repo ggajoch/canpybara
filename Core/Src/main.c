@@ -121,6 +121,8 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  __enable_irq();
+
   LOG_BOOT();
 
   canpybara_can_init();

@@ -375,6 +375,9 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
   canpybara_can_error();
+
+  __HAL_CAN_CLEAR_FLAG(hcan, CAN_FLAG_FOV0);
+  HAL_CAN_Receive_IT(hcan, CAN_FIFO0);
   // LOG("CAN error");
 }
 
