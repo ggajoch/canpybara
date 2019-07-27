@@ -398,13 +398,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Debounce filter
   if(htim == &htim2)
   {
+    
+    __HAL_GPIO_EXTI_CLEAR_IT(IN0_Pin);
+    __HAL_GPIO_EXTI_CLEAR_IT(IN1_Pin);
     // Enable interrupts, disable timer
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);
     HAL_NVIC_EnableIRQ(EXTI1_IRQn);
     HAL_TIM_Base_Stop_IT(&htim2);
-
-    // HAL_GPIO_TogglePin(OUT1_GPIO_Port, OUT1_Pin);
-    HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
   }
 
   if(htim == &htim3)
@@ -416,11 +416,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+  TIM2->CNT = 800;
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_NVIC_DisableIRQ(EXTI0_IRQn);
   HAL_NVIC_DisableIRQ(EXTI1_IRQn);
-  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
-
+  
   __HAL_GPIO_EXTI_CLEAR_IT(IN0_Pin);
   __HAL_GPIO_EXTI_CLEAR_IT(IN1_Pin);
 
