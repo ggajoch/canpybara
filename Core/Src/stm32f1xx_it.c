@@ -416,7 +416,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  TIM2->CNT = 800;
+  htim2.Instance->CNT = 800;
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_NVIC_DisableIRQ(EXTI0_IRQn);
   HAL_NVIC_DisableIRQ(EXTI1_IRQn);
