@@ -199,7 +199,7 @@ void canpybara_wiegand_zone_response(uint8_t response)
 		LOG("Reject");
 		HAL_GPIO_WritePin(WIEGAND_BUZZER_PORT, WIEGAND_BUZZER_PIN, GPIO_PIN_SET);
 	}
-
+	htim3.Instance->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim3);
 }
 
